@@ -39,6 +39,7 @@ import re
 # you may use urllib to encode data appropriately
 # import urllib.parse
 from urllib.parse import urlparse, urlencode
+import textwrap
 
 # GLOBAL
 endl = "\r\n"
@@ -123,13 +124,13 @@ class HTTPClient(object):
         scheme, host, port, path = self.parse_url(url)
         
         # combine # GET <path> ver Host:<host>
-        req_str = \
-f'\
-{md} {path} {ver}{endl}\
-Host: {host}{endl}\
-{conn_cls}{endl}\
-{endl}\
-'
+        req_str = textwrap.dedent(\
+            f'\
+            {md} {path} {ver}{endl}\
+            Host: {host}{endl}\
+            {conn_cls}{endl}\
+            {endl}\
+            ')
 
         # do request
         try:
@@ -168,16 +169,16 @@ Host: {host}{endl}\
         length = len(arg_str.encode('utf-8'))
 
         # combine # GET <path> ver Host:<host>
-        req_str =\
-f'\
-{md} {path} {ver}{endl}\
-Host: {host}{endl}\
-{app}{endl}\
-Content-Length: {length}{endl}\
-{conn_cls}{endl}\
-{endl}\
-{arg_str}\
-'
+        req_str =textwrap.dedent(\
+            f'\
+            {md} {path} {ver}{endl}\
+            Host: {host}{endl}\
+            {app}{endl}\
+            Content-Length: {length}{endl}\
+            {conn_cls}{endl}\
+            {endl}\
+            {arg_str}\
+            ')
         
         # do request
         try:
@@ -194,8 +195,8 @@ Content-Length: {length}{endl}\
         body = lines[-1]
         code = (lines[0].split(' '))[1]
 
-        # print(code)
-        # print(body) 
+        print(code)
+        print(body) 
 
         return HTTPResponse(int(code), body)
 
