@@ -22,7 +22,16 @@ import sys
 import socket
 import re
 # you may use urllib to encode data appropriately
-import urllib.parse
+# import urllib.parse
+from urllib.parse import urlparse
+
+# GLOBAL
+endl = "\r\n"
+sp = " "
+ver = "HTTP/1.1"
+conn_cls = "Connection: close"
+
+
 
 def help():
     print("httpclient.py [GET/POST] [URL]\n")
@@ -68,9 +77,55 @@ class HTTPClient(object):
         return buffer.decode('utf-8')
 
     def GET(self, url, args=None):
+        
         code = 500
         body = ""
-        return HTTPResponse(code, body)
+        req_str = ""
+        md ="GET"
+        port = 80
+        path = "/"
+        scheme = ""
+        
+        o = urlparse(url)
+        # split host and port
+        if (o.port != None):
+            port = o.port
+            host = (o.netloc.split(":"))[0]
+        else:            
+            host = o.netloc
+
+        #path
+        if o.path != "":
+            path = o.path
+
+        # scheme
+        if o.scheme == "https" or o.scheme == "http":
+            scheme = o.scheme + "://"
+
+        
+        
+        # combine # GET <path> ver Host:<host>
+        req_str = f'\
+            {md} {path} {ver}{endl}\
+            Host: {scheme}{host}{endl}\
+            {conn_cls}{endl}{endl}\
+            '
+
+        # do request
+        
+        self.connect(host, port)
+        
+
+        self.sendall(req_str)
+        buffer = self.recvall(self.socket)
+        self.close()
+
+        lines = buffer.split("\r\n")
+        body = lines[-1]
+        # print("body: " + body)
+        code = (lines[0].split(' '))[1]
+        
+        return HTTPResponse(int(code), body)
 
     def POST(self, url, args=None):
         code = 500
@@ -93,3 +148,4 @@ if __name__ == "__main__":
         print(client.command( sys.argv[2], sys.argv[1] ))
     else:
         print(client.command( sys.argv[1] ))
+
