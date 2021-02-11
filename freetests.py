@@ -155,13 +155,13 @@ class TestHTTPClient(unittest.TestCase):
 
 
 
-    # def test404GET(self):
-    #     '''Test against 404 errors'''
-    #     MyHTTPHandler.get = nothing_available
-    #     http = httpclass.HTTPClient()
-    #     req = http.GET("http://%s:%d/49872398432" % (BASEHOST,BASEPORT) )
-    #     self.assertTrue(req != None, "None Returned!")
-    #     self.assertTrue(req.code == 404)
+    def test404GET(self):
+        '''Test against 404 errors'''
+        MyHTTPHandler.get = nothing_available
+        http = httpclass.HTTPClient()
+        req = http.GET("http://%s:%d/49872398432" % (BASEHOST,BASEPORT) )
+        self.assertTrue(req != None, "None Returned!")
+        self.assertTrue(req.code == 404)
 
     # def test404POST(self):
     #     '''Test against 404 errors'''
@@ -182,16 +182,16 @@ class TestHTTPClient(unittest.TestCase):
         self.assertTrue(req.code == 200)
         self.assertTrue(req.body.find(path)>=0, "Data: [%s] " % req.body)
 
-    # def testGETHeaders(self):
-    #     '''Test HTTP GET Headers'''
-    #     MyHTTPHandler.get = header_check
-    #     MyHTTPHandler.post = die_on_method
-    #     http = httpclass.HTTPClient()
-    #     path = "abcdef/gjkd/dsadas"
-    #     url = "http://%s:%d/%s" % (BASEHOST,BASEPORT, path)
-    #     req = http.GET( url )
-    #     self.assertTrue(req != None, "None Returned!")
-    #     self.assertTrue(req.code == 200)
+    def testGETHeaders(self):
+        '''Test HTTP GET Headers'''
+        MyHTTPHandler.get = header_check
+        MyHTTPHandler.post = die_on_method
+        http = httpclass.HTTPClient()
+        path = "abcdef/gjkd/dsadas"
+        url = "http://%s:%d/%s" % (BASEHOST,BASEPORT, path)
+        req = http.GET( url )
+        self.assertTrue(req != None, "None Returned!")
+        self.assertTrue(req.code == 200)
 
     # def testPOSTHeaders(self):
     #     '''Test HTTP POST Headers'''

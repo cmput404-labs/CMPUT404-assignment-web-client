@@ -76,12 +76,8 @@ class HTTPClient(object):
                 done = not part
         return buffer.decode('utf-8')
 
-    def GET(self, url, args=None):
-        
-        code = 500
-        body = ""
-        req_str = ""
-        md ="GET"
+    # parse scheme, host, port, path from url
+    def parse_url(self, url):
         port = 80
         path = "/"
         scheme = ""
@@ -100,9 +96,18 @@ class HTTPClient(object):
 
         # scheme
         if o.scheme == "https" or o.scheme == "http":
-            scheme = o.scheme + "://"
+            scheme = o.scheme + "://" 
 
+        return scheme, host, port, path
+
+    def GET(self, url, args=None):
         
+        code = 500
+        body = ""
+        req_str = ""
+        md ="GET"
+               
+        scheme, host, port, path = self.parse_url(url)
         
         # combine # GET <path> ver Host:<host>
         req_str = f'\
@@ -114,22 +119,28 @@ class HTTPClient(object):
         # do request
         
         self.connect(host, port)
-        
-
         self.sendall(req_str)
         buffer = self.recvall(self.socket)
         self.close()
 
         lines = buffer.split("\r\n")
         body = lines[-1]
-        # print("body: " + body)
         code = (lines[0].split(' '))[1]
+
+        print(code)
+        print(body)        
         
         return HTTPResponse(int(code), body)
 
     def POST(self, url, args=None):
         code = 500
         body = ""
+        md ="POST"
+        app = "Content-Type: application/x-www-form-urlencoded"
+
+
+
+
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
