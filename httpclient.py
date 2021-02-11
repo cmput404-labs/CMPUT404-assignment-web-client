@@ -123,7 +123,13 @@ class HTTPClient(object):
         scheme, host, port, path = self.parse_url(url)
         
         # combine # GET <path> ver Host:<host>
-        req_str = f'{md} {path} {ver}{endl}Host: {host}{endl}{conn_cls}{endl}{endl}'
+        req_str = \
+f'\
+{md} {path} {ver}{endl}\
+Host: {host}{endl}\
+{conn_cls}{endl}\
+{endl}\
+'
 
         # do request
         try:
@@ -162,7 +168,16 @@ class HTTPClient(object):
         length = len(arg_str.encode('utf-8'))
 
         # combine # GET <path> ver Host:<host>
-        req_str = f'{md} {path} {ver}{endl}Host: {host}{endl}{app}{endl}Content-Length: {length}{endl}{conn_cls}{endl}{endl}{arg_str}'
+        req_str =\
+f'\
+{md} {path} {ver}{endl}\
+Host: {host}{endl}\
+{app}{endl}\
+Content-Length: {length}{endl}\
+{conn_cls}{endl}\
+{endl}\
+{arg_str}\
+'
         
         # do request
         try:
