@@ -23,11 +23,10 @@ import socket
 import re
 # you may use urllib to encode data appropriately
 # import urllib.parse
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 
 # GLOBAL
 endl = "\r\n"
-sp = " "
 ver = "HTTP/1.1"
 conn_cls = "Connection: close"
 
@@ -100,8 +99,7 @@ class HTTPClient(object):
 
         return scheme, host, port, path
 
-    def GET(self, url, args=None):
-        
+    def GET(self, url, args=None):        
         code = 500
         body = ""
         req_str = ""
@@ -110,16 +108,16 @@ class HTTPClient(object):
         scheme, host, port, path = self.parse_url(url)
         
         # combine # GET <path> ver Host:<host>
-        req_str = f'\
-            {md} {path} {ver}{endl}\
-            Host: {scheme}{host}{endl}\
-            {conn_cls}{endl}{endl}\
-            '
+        req_str = f'{md} {path} {ver}{endl}Host: {host}{endl}{conn_cls}{endl}{endl}'
 
         # do request
-        
-        self.connect(host, port)
-        self.sendall(req_str)
+        try:
+            self.connect(host, port)
+            self.sendall(req_str)        
+        except:
+            print(code)
+            print(body) 
+            return HTTPResponse(code, body)
         buffer = self.recvall(self.socket)
         self.close()
 
@@ -136,12 +134,40 @@ class HTTPClient(object):
         code = 500
         body = ""
         md ="POST"
+        req_str = ""
         app = "Content-Type: application/x-www-form-urlencoded"
+        arg_str = ""
 
+        scheme, host, port, path = self.parse_url(url)
 
+        #args
+        if args != None:
+            arg_str = urlencode(args)
 
+        length = len(arg_str.encode('utf-8'))
 
-        return HTTPResponse(code, body)
+        # combine # GET <path> ver Host:<host>
+        req_str = f'{md} {path} {ver}{endl}Host: {host}{endl}{app}{endl}Content-Length: {length}{endl}{conn_cls}{endl}{endl}{arg_str}'
+        
+        # do request
+        try:
+            self.connect(host, port)
+            self.sendall(req_str)        
+        except:
+            print(code)
+            print(body) 
+            return HTTPResponse(code, body)
+        buffer = self.recvall(self.socket)
+        self.close()
+
+        lines = buffer.split("\r\n")
+        body = lines[-1]
+        code = (lines[0].split(' '))[1]
+
+        # print(code)
+        # print(body) 
+
+        return HTTPResponse(int(code), body)
 
     def command(self, url, command="GET", args=None):
         if (command == "POST"):
